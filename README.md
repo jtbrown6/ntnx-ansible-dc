@@ -1,10 +1,10 @@
 # Configuration Guide: Nutanix Ansible IaC
 #### Deploying ADDC on Windows Server 2019 v1
 
-### Overview
+## Overview
 This guide provides the exact instructions, code and steps needed to deploy a `Windows Server 2019` Domain Controller on `Nutanix Community Edition 2.1`. Please note that some of the varibles have been hard-coded into the code-base and will require refactoring in a production environment. The ansible node is running on **Ubuntu 22.04** so please adjust commands based on HostOS.
 
-#### Kics Scan Results
+## Security: Kics Scan Results
 Scan results were used with kics_container on `October 5, 2024` and results are located in the `kics_results.json` file and [below](#Kics) at the end of the document. 
 
 #### Quick Start
