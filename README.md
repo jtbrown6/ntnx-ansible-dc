@@ -28,10 +28,12 @@ ansible-playbook 03-ms-domain-provision.yaml
 - [AD Existing Domain Join Module](https://docs.ansible.com/ansible/latest/collections/microsoft/ad/membership_module.html)
 
 ### Future Improvements
-1. Playbook best practices should be able to pass in a variable to identify the type of server that will be deployed and pass in the correct playbook and required variables 
+1. Playbook best practices should be able to pass in a variable to identify the type of server that will be deployed and pass in the correct playbook and required variables
+
     ```python 
     type=domain_controller if (type==domain_controller) else execute playbook_domaincontroller.yaml
     ```
+    
 2. Future Playbooks for DomainControllers should be able to add to an existing forest not create a brand new one
 3. Static IP addresses are not dynamically assigned or variable assigned in `answerfile` and has hard-coded values. Should be abstracted out with an adjoining vars file and loaded during runtime to pass in variables.
 4. Also best practices like blocks and rescue commands have not been added in and should be improved on for fault toleranance for failed task execution
