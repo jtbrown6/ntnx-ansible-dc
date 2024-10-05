@@ -4,6 +4,9 @@
 ### Overview
 This guide provides the exact instructions, code and steps needed to deploy a `Windows Server 2019` Domain Controller on `Nutanix Community Edition 2.1`. Please note that some of the varibles have been hard-coded into the code-base and will require refactoring in a production environment. The ansible node is running on **Ubuntu 22.04** so please adjust commands based on HostOS.
 
+#### Kics Scan Results
+Scan results were used with kics_container on `October 5, 2024` and results are located in the `kics_results.json` file and [below](#Kics) at the end of the document. 
+
 #### Quick Start
 ```bash
 git clone <repo_name>
@@ -382,3 +385,6 @@ There are (3) Different `passes` that are happening in the xml file related to d
 ## Phase VI: Add to an Existing Forest
 
 **Overview:** the process stays the same for all of the playbook except the end, where instead of using the `microsoft.ad.domain` module, we change to the `microsoft.ad.membership` module and remove the forest_mode and match the domain_mode to at or lower than the forest functional level. We will pass in the `domain_admin_user` credentials with a password and set the `domain_controller` parameter per the documentation. 
+
+## Kicks
+![Results](/images/20241005_kics_scan_result.png)

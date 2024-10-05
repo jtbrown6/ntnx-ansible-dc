@@ -1,0 +1,86 @@
+{
+	"kics_version": "v2.1.3",
+	"files_scanned": 4,
+	"lines_scanned": 320,
+	"files_parsed": 4,
+	"lines_parsed": 266,
+	"lines_ignored": 12,
+	"files_failed_to_scan": 0,
+	"queries_total": 285,
+	"queries_failed_to_execute": 0,
+	"queries_failed_to_compute_similarity_id": 0,
+	"scan_id": "console",
+	"severity_counters": {
+		"CRITICAL": 0,
+		"HIGH": 0,
+		"INFO": 1,
+		"LOW": 1,
+		"MEDIUM": 0,
+		"TRACE": 0
+	},
+	"total_counter": 2,
+	"total_bom_resources": 0,
+	"start": "2024-10-05T18:15:09.595359629Z",
+	"end": "2024-10-05T18:15:13.068633548Z",
+	"paths": [
+		"/path"
+	],
+	"queries": [
+		{
+			"query_name": "Logging of Sensitive Data",
+			"query_id": "c6473dae-8477-4119-88b7-b909b435ce7b",
+			"query_url": "https://docs.ansible.com/ansible/latest/reference_appendices/logging.html#protecting-sensitive-data-with-no-log",
+			"severity": "LOW",
+			"platform": "Ansible",
+			"cwe": "532",
+			"cloud_provider": "COMMON",
+			"category": "Best Practices",
+			"experimental": false,
+			"description": "To keep sensitive values out of logs, tasks that expose them need to be marked defining 'no_log' and setting to True",
+			"description_id": "0eca35f3",
+			"files": [
+				{
+					"file_name": "../../path/ansible.cfg",
+					"similarity_id": "88f433d5f6a38c60258e564cce4d85ccb01dfbc20eaf36d7bb5ab04837624d70",
+					"line": 1,
+					"resource_type": "n/a",
+					"resource_name": "n/a",
+					"issue_type": "IncorrectValue",
+					"search_key": "defaults",
+					"search_line": -1,
+					"search_value": "",
+					"expected_value": "no_log should be defined and set to 'true'",
+					"actual_value": "no_log is not defined"
+				}
+			]
+		},
+		{
+			"query_name": "Risky File Permissions",
+			"query_id": "88841d5c-d22d-4b7e-a6a0-89ca50e44b9f",
+			"query_url": "https://ansible.readthedocs.io/projects/lint/rules/risky-file-permissions/",
+			"severity": "INFO",
+			"platform": "Ansible",
+			"cwe": "732",
+			"cloud_provider": "COMMON",
+			"category": "Supply-Chain",
+			"experimental": false,
+			"description": "Some modules could end up creating new files on disk with permissions that might be too open or unpredictable",
+			"description_id": "1f0e1485",
+			"files": [
+				{
+					"file_name": "../../path/01_ntnx_vm_provision.yaml",
+					"similarity_id": "2354dc118a63b9776a9e5b6ab44ba6a757831d8fe1adcd1b8119dfe45edf4b0b",
+					"line": 29,
+					"resource_type": "ansible.builtin.template",
+					"resource_name": "Microsoft Windows Server Sysprep Unattend.xml Generation",
+					"issue_type": "MissingAttribute",
+					"search_key": "name={{Microsoft Windows Server Sysprep Unattend.xml Generation}}.{{ansible.builtin.template}}",
+					"search_line": 0,
+					"search_value": "",
+					"expected_value": "All the permissions set in ansible.builtin.template about creating files/directories",
+					"actual_value": "There are some permissions missing in ansible.builtin.template and might create directory/file"
+				}
+			]
+		}
+	]
+}
