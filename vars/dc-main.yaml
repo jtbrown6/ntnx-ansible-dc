@@ -1,0 +1,24 @@
+# code: language=ansible
+---
+drives:
+  - drive_letter: D
+    disk_number: 2
+    partition_number: 1
+    new_label: AD Data
+  - drive_letter: L
+    disk_number: 1
+    partition_number: 1
+    new_label: AD Logs
+folders:
+  - D:\NTDS\
+  - D:\SYSVOL\
+  - L:\Logs\
+
+dc_database_path: D:\NTDS
+dc_dns_domain_name: abc.com
+dc_domain_log_path: L:\Logs
+dc_sysvol_path: D:\SYSVOL
+
+domain_admin_user: 'ABC\Administrator' # double backslask or singlequote single slash to bypass error
+domain_admin_password: password_here
+safe_mode_password: safe_password_here

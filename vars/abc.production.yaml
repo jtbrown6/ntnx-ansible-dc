@@ -1,0 +1,15 @@
+# code: language=ansible
+---
+ad_domain_services:
+  - site: "01"
+    ad:
+      ds:
+        - servers:
+            - 192.168.1.1
+      dns:
+        - servers:
+            - 192.168.1.1
+
+adds_domain: abc.com
+adds_ou_ms_servers: "OU=Microsoft,OU=Servers,DC=abc,DC=com"
+dns_servers: "192.168.1.1"

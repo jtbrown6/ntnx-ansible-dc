@@ -1,0 +1,21 @@
+---
+nutanix_cluster_ip: 192.168.1.11
+nutanix_cluster_name: Lab-Test
+nutanix_cluster_network_name: Lab-Test-Primary
+nutanix_cluster_storage_container: Lab-Test-Primary
+nutanix_image_name: WindowServer-2019-Golden
+adds_domain: abc.com
+
+vm_desc: MS ADDS Directory Server 001
+vm_name: ds-001-xy
+vm_memory_gb: 4
+vm_num_vcpus: 2
+vm_num_cores_per_vcpu: 1
+
+vm_network_ipv4_address: 192.168.1.156
+vm_network_ipv4_default_gateway: 192.168.1.1
+vm_network_ipv4_prefixlength: 24
+
+
+vm_additional_disk_list_dc_small: 10
+vm_additional_disk_list_dc_large: 20
