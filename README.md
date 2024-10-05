@@ -386,5 +386,5 @@ There are (3) Different `passes` that are happening in the xml file related to d
 
 **Overview:** the process stays the same for all of the playbook except the end, where instead of using the `microsoft.ad.domain` module, we change to the `microsoft.ad.membership` module and remove the forest_mode and match the domain_mode to at or lower than the forest functional level. We will pass in the `domain_admin_user` credentials with a password and set the `domain_controller` parameter per the documentation. 
 
-## Kicks
+## Kics
 ![Results](/images/20241005_kics_scan_result.png)
