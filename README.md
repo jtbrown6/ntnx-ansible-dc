@@ -7,7 +7,7 @@ This guide provides the exact instructions, code and steps needed to deploy a `W
 ## Security: Kics Scan Results
 Scan results were used with kics_container on `October 5, 2024` and results are located in the `kics_results.json` file and [below](#Kics) at the end of the document. 
 
-#### Quick Start
+### Quick Start Guide
 ```bash
 git clone <repo_name>
 
@@ -21,7 +21,7 @@ ansible-playbook 02-static_drive_ms-win-drive_initialize.yaml
 ansible-playbook 03-ms-domain-provision.yaml
 ```
 
-Important Links:
+#### Important Links:
 - [Nutanix Ansible Galaxy Collection](https://galaxy.ansible.com/ui/repo/published/nutanix/ncp/)
 - [Windows Community Modules Full List](https://galaxy.ansible.com/ui/repo/published/community/windows/docs/?extIdCarryOver=true&sc_cid=701f2000001OH6uAAG)
 - [AD Domain New Forest Module](https://docs.ansible.com/ansible/latest/collections/microsoft/ad/domain_module.html)
