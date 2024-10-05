@@ -1,0 +1,13 @@
+[dev]
+localhost ansible_connection=local
+
+[windows]
+win-srv-2019-dc ansible_host=192.168.1.156
+
+[windows:vars]
+ansible_user=Administrator
+ansible_password=password_here
+ansible_connection=winrm
+ansible_winrm_transport=ntlm
+ansible_winrm_server_cert_validation=ignore
+ansible_port=5985

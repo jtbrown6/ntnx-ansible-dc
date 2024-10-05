@@ -1,0 +1,74 @@
+---
+- name: Clusters_Info playbook
+  hosts: localhost
+  gather_facts: false
+  collections:
+    - nutanix.ncp
+  module_defaults:
+    group/nutanix.ncp.ntnx:
+      nutanix_host: "{{ pc_ip }}"
+      nutanix_username: "{{ vault_pc_username }}"
+      nutanix_password: "{{ vault_pc_password }}"
+      validate_certs: false
+
+  tasks:
+    - name: Temporary Facts Setting
+      ansible.builtin.set_fact:
+        nutanix_vm_additional_disks_required: true
+        server_role: domain_controller
+        vm_timezone_name: US Eastern Standard Time
+
+    - name: Import Variables
+      ansible.builtin.include_vars:
+        file: "{{ item }}"
+      loop:
+        - vars/abc.production.yaml
+        - vars/main.yaml
+
+    - name: Microsoft Windows Server Sysprep Unattend.xml Generation
+      ansible.builtin.template:
+        src: templates/ms-win-srv-2019-template.xml.j2
+        dest: ./temp_sysprep_unattend.xml
+
+    - name: Provisioning
+      nutanix.ncp.ntnx_vms:
+        nutanix_host: "{{ nutanix_cluster_ip }}"
+        validate_certs: false
+        state: present
+        cluster:
+          name: "{{ nutanix_cluster_name }}"
+        name: "{{ vm_name }}"
+        desc: "{{ vm_desc }}"
+        memory_gb: "{{ vm_memory_gb }}"
+        vcpus: "{{ vm_num_vcpus }}"
+        cores_per_vcpu: "{{ vm_num_cores_per_vcpu }}"
+        boot_config:
+          boot_type: UEFI
+          boot_order:
+            - DISK
+            - CDROM
+            - NETWORK
+        disks:
+          - type: "DISK"
+            clone_image:
+              name: "{{ nutanix_image_name }}"
+            size_gb: 80
+            bus: "SATA"
+          - type: DISK
+            size_gb: "{{ vm_additional_disk_list_dc_small }}"
+            bus: "SATA"
+            storage_container:
+              uuid: "c2851433-6609-45b4-bb59-dff921862c53"
+          - type: DISK
+            size_gb: "{{ vm_additional_disk_list_dc_large }}"
+            bus: "SATA"
+            storage_container:
+              uuid: "c2851433-6609-45b4-bb59-dff921862c53"
+        networks:
+          - is_connected: true
+            subnet:
+              name: "{{ nutanix_cluster_network_name }}"
+            private_ip: "{{ vm_network_ipv4_address }}"
+        guest_customization:
+          type: "sysprep"
+          script_path: ./temp_sysprep_unattend.xml

@@ -1,0 +1,102 @@
+---
+- name: Initialization of Drives
+  hosts: windows
+  gather_facts: false
+
+  tasks:
+    # Set default allocation_unit_size if not defined
+    - name: Set default allocation_unit_size if not defined
+      ansible.builtin.set_fact:
+        allocation_unit_size: 0
+      when: allocation_unit_size is not defined
+
+    - name: File System Configuration
+      block:
+        - name: CD-ROM Drive Letter Assignment
+          ansible.windows.win_powershell:
+            script: |
+              $optical = Get-CimInstance win32_volume | Where-Object DriveType -eq 5
+              If ($optical) {
+                If ( 'Z:' -ne $optical.DriveLetter) {
+                  $optical.DriveLetter = 'Z:'
+                  Set-CimInstance $optical
+                }
+              }
+
+        - name: Gather disk facts
+          community.windows.win_disk_facts:
+            filter:
+              - physical_disk
+
+        - name: Gather all RAW disks
+          ansible.builtin.set_fact:
+            raw_disks: "{{ ansible_disks | json_query(jmes_query) }}"
+          vars:
+            jmes_query: "[?partition_style=='RAW']"
+
+        - name: Debug - Show the result - raw_disks
+          ansible.builtin.debug:
+            var: raw_disks
+          tags:
+            - debug
+            - never
+
+        - name: Ensure RAW disks are Initialized
+          community.windows.win_initialize_disk:
+            disk_number: "{{ item.number }}"
+          loop: "{{ raw_disks }}"
+
+        - name: Partition and Format Block if we have RAW disks
+          when: raw_disks | length > 0
+          block:
+            - name: Update disk facts after Initialization
+              community.windows.win_disk_facts:
+
+            - name: Gather all partitions with partition style GPT without volumes and not a system disk
+              ansible.builtin.set_fact:
+                partition_list: "{{ ansible_disks | json_query(jmes_query) }}"
+              vars:
+                jmes_query: "[?partition_style=='GPT' && system_disk==`false` && partitions[?volumes == null]]"
+
+            - name: Debug - Show results - partition_list
+              ansible.builtin.debug:
+                var: partition_list
+              tags:
+                - debug
+                - never
+
+            # Explicitly assign drive letters D and L
+            - name: Ensure partitions on RAW disks are created with specific drive letters
+              community.windows.win_partition:
+                disk_number: "{{ item.number }}"
+                drive_letter: "{{ item.drive_letter }}"
+                partition_size: "-1"
+                state: present
+              loop:
+                - { number: "{{ partition_list[0].number }}", drive_letter: "L" }
+                - { number: "{{ partition_list[1].number }}", drive_letter: "D" }
+              no_log: true
+
+            - name: Update disk facts after partitioning
+              community.windows.win_disk_facts:
+
+            - name: Gather all disks with unformatted volumes
+              ansible.builtin.set_fact:
+                volumes_list: "{{ ansible_disks | json_query(jmes_query) }}"
+              vars:
+                jmes_query: "[?partitions[?volumes[?size == `0`]]].{number: number, drive_letter: partitions[].drive_letter, size: physical_disk.size}"
+
+            - name: Debug - Show results - volumes_list
+              ansible.builtin.debug:
+                var: volumes_list
+              tags:
+                - debug
+                - never
+
+            - name: Ensure unformatted volumes are formatted with NTFS file system
+              community.windows.win_format:
+                drive_letter: "{{ item.drive_letter | first }}"
+                new_label: "DATA{{ item.number }}"
+                allocation_unit_size: "{% if allocation_unit_size == 0 %}{% if (item.size | int) > 2199023255552 %}65536{% else %}4096{% endif %}{% else %}{{ allocation_unit_size }}{% endif%}"
+                file_system: "ntfs"
+              loop: "{{ volumes_list }}"

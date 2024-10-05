@@ -1,0 +1,75 @@
+- name: Deploy Domain Controller
+  hosts: windows
+
+  tasks:
+    - name: Import Variables
+      ansible.builtin.include_vars:
+        file: vars/dc-main.yaml
+
+    - name: Ensure Disks Are Initialized
+      community.windows.win_initialize_disk:
+        disk_number: "{{ item.disk_number }}"
+        style: GPT
+      loop: "{{ drives }}"
+
+    # - name: Ensure Partitions Exist with Specific Drive Letters
+    #   community.windows.win_partition:
+    #     disk_number: "{{ item.disk_number }}"
+    #     partition_number: "{{ item.partition_number }}"
+    #     drive_letter: "{{ item.drive_letter }}"
+    #     partition_size: -1
+    #     state: present
+    #   loop: "{{ drives }}"
+
+    - name: Format Partitions
+      community.windows.win_format:
+        drive_letter: "{{ item.drive_letter }}"
+        file_system: NTFS
+        new_label: "{{ item.new_label }}"
+      loop: "{{ drives }}"
+
+    - name: File Folder Setup
+      ansible.windows.win_file:
+        path: "{{ item }}"
+        state: directory
+      loop: "{{ folders }}"
+
+    - name: Ensure DNS Role is Installed
+      ansible.windows.win_feature:
+        name: DNS
+        state: present
+
+    - name: Install Windows Server Feature
+      ansible.windows.win_feature:
+        name: AD-Domain-Services
+        state: present
+
+
+    - name: Promote server to a Domain Controller for a new domain
+      microsoft.ad.domain:
+        dns_domain_name: "{{ dc_dns_domain_name }}"
+        domain_netbios_name: "ABC"
+        forest_mode: "WinThreshold"
+        domain_mode: "WinThreshold"
+        create_dns_delegation: false
+        install_dns: true
+        safe_mode_password: "{{ safe_mode_password }}"
+        database_path: "{{ dc_database_path }}"
+        sysvol_path: "{{ dc_sysvol_path }}"
+        log_path: "{{ dc_domain_log_path }}"
+        reboot: true
+
+# This is not the best approach putting Powershell inside the script as this loeses out on Ansible features
+    # - name: Promote server to a Domain Controller using PowerShell
+    #   ansible.windows.win_powershell:
+    #     script: |
+    #       Install-ADDSForest `
+    #         -DomainName "{{ dc_dns_domain_name }}" `
+    #         -DomainNetbiosName "ABC" `
+    #         -ForestMode "WinThreshold" `
+    #         -DomainMode "WinThreshold" `
+    #         -InstallDNS `
+    #         -SafeModeAdministratorPassword (ConvertTo-SecureString "{{ safe_mode_password }}" -AsPlainText -Force) `
+    #         -Force
+    #   become: true
+    #   become_method: ansible.builtin.runas
